@@ -13,6 +13,7 @@ class FileParser {
     static let sharedInstance = FileParser()
     
     var _excludesFileExtensions = [String]()
+    var _includesFileExtensions = [String]()
     
     /// Mapped for case insensitivity
     var excludesFileExtensions: [String]? {
@@ -22,6 +23,18 @@ class FileParser {
         set {
             if let newValue = newValue {
                 _excludesFileExtensions = newValue
+            }
+        }
+    }
+    
+    /// Mapped for case insensitivity
+    var includesFileExtensions: [String]? {
+        get {
+            return _includesFileExtensions.map({$0.lowercased()})
+        }
+        set {
+            if let newValue = newValue {
+                _includesFileExtensions = newValue
             }
         }
     }
@@ -46,6 +59,9 @@ class FileParser {
         // Parse
         for filePath in filePaths {
             let file = FBFile(filePath: filePath)
+            if let includesFileExtensions = includesFileExtensions, let fileExtensions = file.fileExtension , !includesFileExtensions.contains(fileExtensions) {
+                continue
+            }
             if let excludesFileExtensions = excludesFileExtensions, let fileExtensions = file.fileExtension , excludesFileExtensions.contains(fileExtensions) {
                 continue
             }
